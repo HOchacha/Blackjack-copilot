@@ -1,3 +1,5 @@
+if __name__!="__main__":exit()
+
 import cv2
 from ultralytics import YOLO
 import numpy as np
@@ -5,7 +7,7 @@ import torch
 import pafy
 print("import--")
 
-MODEL=r"runs\detect\train6\weights\last.pt" # Input your path of model file
+MODEL=r"runs\detect\train14\weights\last.pt" # Input your path of model file
 URL='https://www.youtube.com/watch?v=fbb5nFIjMn0'
 
 def resize(frame):

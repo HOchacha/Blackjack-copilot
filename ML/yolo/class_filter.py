@@ -1,3 +1,5 @@
+if __name__!="__main__":exit()
+
 import argparse
 import os
 import yaml
