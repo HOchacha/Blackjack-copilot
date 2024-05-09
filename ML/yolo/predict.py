@@ -5,7 +5,7 @@ import torch
 import pafy
 print("import--")
 
-MODEL=r"yolov8n.pt" # Input your path of model file
+MODEL=r"runs\detect\train6\weights\last.pt" # Input your path of model file
 URL='https://www.youtube.com/watch?v=fbb5nFIjMn0'
 
 def resize(frame):
@@ -51,6 +51,7 @@ def fromvideo():
     print("pafy--")
     best = video.getbest(preftype="mp4")
     cap = cv2.VideoCapture(best.url)
+    print("fromvideo--")
     return cap
 
 #cap = cv2.VideoCapture("dogs.mp4")

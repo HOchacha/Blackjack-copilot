@@ -5,9 +5,11 @@ import shutil
 
 parser=argparse.ArgumentParser()
 
-parser.add_argument("-s", required=True, help="source dataset directory")
-parser.add_argument("-t", required=True, help="target dataset directory")
-parser.add_argument("-c", required=True, help="classes")
+parser.add_argument("-s", required=False, help="source dataset directory",
+                    default=r"C:\Blackjack-copilot\ML\yolo\datasets\Playing Cards.v4-fastmodel-resized640-aug3x.yolov8")
+parser.add_argument("-t", required=False, help="target dataset directory",
+                    default=r"C:\Blackjack-copilot\ML\yolo\datasets\Playing Cards.0")
+parser.add_argument("-c", required=False, help="classes", default="0")
 
 args = parser.parse_args()
 classes = [*map(int, args.c.split())]
