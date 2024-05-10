@@ -1,4 +1,4 @@
-test
-train
-valid
+images
+labels
+labels.cache
 *.zip

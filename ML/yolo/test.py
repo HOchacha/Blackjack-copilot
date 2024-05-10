@@ -5,7 +5,7 @@ import time
 import random
 import constants
 
-IMAGES_DIR=r"datasets\Playing Cards.0\test\images"
+IMAGES_DIR=constants.DATA+r"\..\test\images"
 
 images=class_filter.get_files(IMAGES_DIR)
 random.shuffle(images)

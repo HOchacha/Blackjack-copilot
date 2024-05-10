@@ -4,10 +4,9 @@ import time
 import constants
 
 # Load a model
-model = YOLO(constants.MODEL)  # load a pretrained model (recommended for training)
+model = YOLO(constants.MODEL)  # load a pretrained model
 
 if __name__ == "__main__":
-    # Train the model
     STARTTIME=time.time()
     print("Start time: %s"%datetime.datetime.now())
     results = model.val()
