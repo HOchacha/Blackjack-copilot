@@ -1,9 +1,9 @@
 from ultralytics import YOLO
 import constants
-
 print("import--")
 
-model=YOLO(constants.MODEL)
-results = model(constants.IMAGE)
-result =results[0]
-result.show()
+im=r"test\videoframe_191642.png"
+
+model=YOLO(constants.BEST)
+results = model.predict(im, imgsz=(720,1280))
+results[0].show()
