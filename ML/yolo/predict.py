@@ -1,5 +1,3 @@
-if __name__!="__main__":exit()
-
 import cv2
 from ultralytics import YOLO
 import numpy as np
@@ -52,6 +50,7 @@ def fromvideo():
     video = pafy.new(URL)
     print("pafy--")
     best = video.getbest(preftype="mp4")
+    print("getbest--")
     cap = cv2.VideoCapture(best.url)
     print("fromvideo--")
     return cap
@@ -60,12 +59,18 @@ def fromvideo():
 cap=fromvideo()
 #cap = cv2.VideoCapture(0)
 
+cudaa=torch.cuda.is_available()
+print("cudaa=%s"%cudaa)
+
 while True:
     ret, frame = cap.read()
     if not ret:
         break
 
-    results = model(frame)
+    if cudaa:
+        results = model(frame, device=0)
+    else:
+        results = model(frame)
 
     # # For Apple Silicon
     # if torch.backends.mps.is_available() :
