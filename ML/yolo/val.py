@@ -1,11 +1,10 @@
 import datetime
 from ultralytics import YOLO
 import time
-
-MODEL=r"runs\detect\train9\weights\last.pt"
+import constants
 
 # Load a model
-model = YOLO(MODEL)  # load a pretrained model (recommended for training)
+model = YOLO(constants.MODEL)  # load a pretrained model (recommended for training)
 
 if __name__ == "__main__":
     # Train the model
