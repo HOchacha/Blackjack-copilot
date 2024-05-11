@@ -1,14 +1,22 @@
-def get_distance3(width, height):
-    return (width**2 + height**2)**0.5
+import sys
+import os
+import copy
 
-def get_distance(x1, y1, x2, y2):
-    return ((x1 - x2)**2 + (y1 - y2)**2)**0.5
+imported = __name__ != "__main__"
+if imported: sys.path.append(os.path.dirname(__file__))
 
-def get_distance2(xy1, xy2):
-    return get_distance(xy1[0], xy1[1], xy2[0], xy2[1])
+import matcher
+import math2
 
-def predict(data, height, width):
-    n = len(data)
+if imported: sys.path.remove(os.path.dirname(__file__))
+
+def predict(yresult):
+    xyxycpu = yresult.boxes.xyxy.cpu()
+    height = yresult.orig_shape[0]
+    width = yresult.orig_shape[1]
+    cls = yresult.boxes.cls.cpu()
+
+    n = len(xyxycpu)
 
     if n == 0:
         return []
@@ -16,7 +24,10 @@ def predict(data, height, width):
     if n == 1:
         return [0]
     
-    standard = min(width, height) * 0.22
+    matcharr = matcher.match_cards(yresult)
+    xyxycpu_clone = copy.deepcopy(xyxycpu)
+    
+    standard = min(width, height) * 0.16
 
     # -1 means it is not belong to any cluster yet
     ret = [-1] * n
@@ -30,10 +41,15 @@ def predict(data, height, width):
             uniqueid += 1
 
         for j in range(i+1, n):
-            distance = get_distance2(data[i], data[j])
+            distance = math2.get_distance2(xyxycpu[i], xyxycpu[j])
+
+            threshold = standard
+            # apply loose standard if two classes are equal
+            if cls[i] == cls[j]:
+                threshold = threshold * 1.4
 
             # if i and j should be in the same cluster
-            if distance < standard:
+            if distance < threshold:
                 if ret[j] != -1:
                     ret[i] = ret[j]
                 else:
