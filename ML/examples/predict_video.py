@@ -19,6 +19,7 @@ model = yoluster.get_best_yolo_model()
 
 # Open the video file
 cap = cv2.VideoCapture(VIDEO)
+stress = 0
 
 # Loop through the video frames
 while cap.isOpened():
@@ -26,6 +27,10 @@ while cap.isOpened():
     success, frame = cap.read()
 
     if success:
+        if stress == 1:
+            stress = 0
+            continue
+
         # Run YOLOv8 inference on the frame
         results = yoluster.yolo_predict_m(model, frame)
 
@@ -36,8 +41,15 @@ while cap.isOpened():
         cv2.imshow("YOLOv8 Inference", annotated_frame)
 
         # Break the loop if 'q' is pressed
-        if cv2.waitKey(1) & 0xFF == ord("q"):
+        pkey = cv2.waitKey(1) & 0xFF
+        if pkey == ord("q"):
             break
+        # pause if 'p' is pressed
+        if pkey == ord("p"):
+            cv2.waitKey()
+
+        stress += 1
+
     else:
         # Break the loop if the end of the video is reached
         break
