@@ -37,3 +37,35 @@ def match_cards(yresult):
                 uniqueid += 1
     
     return ret
+
+def get_pairs(matcharr):
+    n = len(matcharr)
+    ret = []
+
+    for i in range(n):
+        cls = matcharr[i]
+        if cls == -1: continue
+
+
+        j = matcharr.index(cls, i+1)
+        ret.append((i,j))
+        matcharr[i] = -1
+        matcharr[j] = -1
+
+    return ret
+
+def getpairarr(yresult):
+    return get_pairs(match_cards(yresult))
+
+def do_mid_on_arr(xyarr, pairs):
+    for i, j in pairs:
+        midxy = math2.get_mid(xyarr[i], xyarr[j])
+        xyarr[i] = midxy
+        xyarr[j] = midxy
+
+def get_matched_xy_arr(yresult):
+    pairs = getpairarr(yresult)
+    xyxycpu = yresult.boxes.xyxy.cpu()
+    centerarr = math2.get_center_arr(xyxycpu)
+    do_mid_on_arr(centerarr, pairs)
+    return centerarr

@@ -1,20 +1,10 @@
-import sys
-import os
-import copy
-
-imported = __name__ != "__main__"
-if imported: sys.path.append(os.path.dirname(__file__))
-
 import matcher
 import math2
-
-if imported: sys.path.remove(os.path.dirname(__file__))
 
 def predict(yresult):
     xyxycpu = yresult.boxes.xyxy.cpu()
     height = yresult.orig_shape[0]
     width = yresult.orig_shape[1]
-    cls = yresult.boxes.cls.cpu()
 
     n = len(xyxycpu)
 
@@ -24,10 +14,9 @@ def predict(yresult):
     if n == 1:
         return [0]
     
-    matcharr = matcher.match_cards(yresult)
-    xyxycpu_clone = copy.deepcopy(xyxycpu)
+    matchedxyarr = matcher.get_matched_xy_arr(yresult)
     
-    standard = min(width, height) * 0.16
+    standard = min(width, height) * 0.2
 
     # -1 means it is not belong to any cluster yet
     ret = [-1] * n
@@ -41,15 +30,10 @@ def predict(yresult):
             uniqueid += 1
 
         for j in range(i+1, n):
-            distance = math2.get_distance2(xyxycpu[i], xyxycpu[j])
-
-            threshold = standard
-            # apply loose standard if two classes are equal
-            if cls[i] == cls[j]:
-                threshold = threshold * 1.4
+            distance = math2.get_distance2(matchedxyarr[i], matchedxyarr[j])
 
             # if i and j should be in the same cluster
-            if distance < threshold:
+            if distance < standard:
                 if ret[j] != -1:
                     ret[i] = ret[j]
                 else:
