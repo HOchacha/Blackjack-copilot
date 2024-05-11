@@ -35,7 +35,7 @@ def get_center_xyxy(xyxy:list) -> tuple:
 def get_center_arr_xyxy_arr(xyxy_arr:list) -> list:
     return [*map(get_center_xyxy, xyxy_arr)]
 
-def match_cards(yresult, k=0.23) -> list:
+def match_cards(yresult, k=0.32) -> list:
     xyxycpu = yresult.boxes.xyxy.cpu()
     height = yresult.orig_shape[0]
     width = yresult.orig_shape[1]
@@ -106,8 +106,15 @@ def get_matched_xy_arr(yresult) -> list:
     do_pair_on_arr(centerarr, pairs)
     return centerarr
 
+def compress_coords(arr:list) -> None:
+    unique_coords = sorted(set(arr)) # O(n log n)
+    coord_dict = {coord: i for i, coord in enumerate(unique_coords)} # O(n)
+    compressed_coords = [coord_dict[coord] for coord in arr]
+    
+    for i in range(len(arr)):
+        arr[i] = compressed_coords[i]
 
-def predict(yresult) -> list:
+def predict(yresult, k=0.23) -> list:
     xyxycpu = yresult.boxes.xyxy.cpu()
     height = yresult.orig_shape[0]
     width = yresult.orig_shape[1]
@@ -122,7 +129,7 @@ def predict(yresult) -> list:
     
     matchedxyarr = get_matched_xy_arr(yresult)
     
-    standard = min(width, height) * 0.23
+    standard = min(width, height) * k
 
     # -1 means it is not belong to any cluster yet
     ret = [-1] * n
@@ -144,7 +151,9 @@ def predict(yresult) -> list:
                     ret[i] = ret[j]
                 else:
                     ret[j] = ret[i]
-    
+        
+    compress_coords(ret)
+
     #e.g. [0 0 0 1 0 1 1 2 2 0 1 2 3]
     return ret
 
@@ -158,7 +167,7 @@ def get_size_of_clusters(cresult:list) -> list:
         ret[cresult[i]] += 1
     return ret
 
-def find_dealer_cluster(yresult, cresult:list) -> int:
+def get_dealer_index(yresult, cresult:list) -> int:
     n = len(cresult)
     if n == 0:
         return -1
@@ -180,7 +189,7 @@ def find_dealer_cluster(yresult, cresult:list) -> int:
     for i in range(n_clusters):
         avgy[i] /= size_of_clusters[i]
 
-    return np.argmax(avgy)
+    return np.argmin(avgy)
 
 def get_class_of_box(box) -> int:
     return int(box.cls)
@@ -204,6 +213,30 @@ def get_plain_result(yresult, cresult:list) -> list:
         ret[cluster_idx] += (nameofclass,)
 
     return ret
+
+def get_count_dict(bagg:tuple) -> dict:
+    ret = dict()
+    for i in bagg:
+        if i not in ret:
+            ret[i] = 1
+        else:
+            ret[i] += 1
+    
+    #e.g. {"KH": 2, "9S": 1, "6D": 3}
+    return ret
+
+def match_result(plain_result) -> None:
+    n = len(plain_result)
+
+    for i in range(n):
+        clust = plain_result[i]
+        count_dict = get_count_dict(clust)
+        newtuple = tuple()
+        for key in count_dict:
+            count = count_dict[key]
+            card_count = (count + 1) // 2
+            newtuple += (key,) * card_count
+        plain_result[i] = newtuple
 
 def visualize(yresult, cresult:list):
     im = yresult.orig_img

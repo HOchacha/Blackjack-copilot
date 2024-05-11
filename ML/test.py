@@ -11,6 +11,10 @@ yresult = yresults[0]
 cresult = cluster.predict(yresult)
 presult = cluster.get_plain_result(yresult, cresult)
 print(presult)
+cluster.match_result(presult)
+print(presult)
+dealer_index = cluster.get_dealer_index(yresult, cresult)
+print(dealer_index)
 
 im = cluster.visualize(yresult, cresult)
 cv2.imshow("result", im)
