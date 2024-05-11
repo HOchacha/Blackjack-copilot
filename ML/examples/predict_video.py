@@ -1,15 +1,24 @@
-BEST = r"C:\Blackjack-copilot\ML\yolo\train_workspace\runs\detect\train\weights\best.pt"
+import os
+import sys
 
-# https://docs.ultralytics.com/modes/predict/#streaming-source-for-loop
+af = os.path.abspath(__file__)
+di = os.path.dirname(af)
+did = os.path.dirname(di)
+sys.path.append(did)
+VIDEO = os.path.join(did, "yolo", "train_workspace", "extern_test_videos", "blackjack.mp4")
+if not os.path.isfile(VIDEO):
+    raise FileNotFoundError(VIDEO)
+
+# based on https://docs.ultralytics.com/modes/predict/#streaming-source-for-loop
+
+import yoluster
 import cv2
-from ultralytics import YOLO
-import cluster
 
 # Load the YOLOv8 model
-model = YOLO(BEST)
+model = yoluster.get_best_yolo_model()
 
 # Open the video file
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(VIDEO)
 
 # Loop through the video frames
 while cap.isOpened():
@@ -18,12 +27,10 @@ while cap.isOpened():
 
     if success:
         # Run YOLOv8 inference on the frame
-        results = model(frame)
-
+        results = yoluster.yolo_predict_m(model, frame)
 
         # Visualize the results on the frame
-        # annotated_frame = results[0].plot()
-        annotated_frame = cluster.visualize_by_yresult(results[0])
+        annotated_frame = yoluster.plot(results[0])
 
         # Display the annotated frame
         cv2.imshow("YOLOv8 Inference", annotated_frame)

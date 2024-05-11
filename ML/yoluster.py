@@ -2,6 +2,11 @@ import os
 from ultralytics.utils.plotting import Annotator
 import numpy as np
 import sys
+from ultralytics import YOLO
+import cv2
+
+di = os.path.dirname(os.path.abspath(__file__))
+BEST = os.path.join(di, "yolo", "train_workspace", "runs", "detect", "train", "weights", "best.pt")
 
 def get_files(dir:str) -> list:
     dirlist = os.listdir(dir)
@@ -127,7 +132,7 @@ def compress_coords(arr:list) -> None:
     for i in range(len(arr)):
         arr[i] = compressed_coords[i]
 
-def predict(yresult, k=0.22) -> list:
+def cluster_predict(yresult, k=0.22) -> list:
     xyxycpu = yresult.boxes.xyxy.cpu()
     height = yresult.orig_shape[0]
     width = yresult.orig_shape[1]
@@ -284,12 +289,12 @@ def visualize(yresult, cresult:list):
     im = annotator.result()
     return im
 
-def visualize_by_yresult(yresult):
-    cresult = predict(yresult)
+def plot(yresult):
+    cresult = cluster_predict(yresult)
     return visualize(yresult, cresult)
 
-def get_final_result_by_yresult(yresult):
-    cresult = predict(yresult)
+def yoluster_predict(yresult) -> list:
+    cresult = cluster_predict(yresult)
     presult = get_plain_result(yresult, cresult)
     match_result(presult)
     dealer_index = get_dealer_index(yresult, cresult)
@@ -300,3 +305,23 @@ def get_final_result_by_yresult(yresult):
         dealer_index = 0
 
     return presult
+
+def get_model(model_path:str) -> YOLO:
+    return YOLO(model_path)
+
+def get_best_yolo_model() -> YOLO:
+    return get_model(BEST)
+
+def yolo_predict_with_image_path(model:YOLO, image_path:str):
+    im = cv2.imread(image_path)
+    return yolo_predict_m(model, im)
+
+def yolo_predict_m(model:YOLO, matlike):
+    height = matlike.shape[0]
+    width = matlike.shape[1]
+    imgsz = (int(height), int(width))
+        
+    # NOTE: "imgsz" parameter is NECESSARY to predict for image size other than 640x640.
+    results = model.predict(matlike, imgsz=imgsz) 
+
+    return results
