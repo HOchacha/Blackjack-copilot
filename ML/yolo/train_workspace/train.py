@@ -1,5 +1,12 @@
-PRETRAINED_MODEL = r"C:\Blackjack-copilot\ML\yolo\train_workspace\pretrained_models\yolov8s_playing_cards.pt"
-DATA=r"C:\Blackjack-copilot\ML\yolo\train_workspace\datasets\Playing Cards.v3-original_raw-images.yolov8\data.yaml"
+import os
+
+di = os.path.dirname(__file__)
+DATA=os.path.join(di, "datasets", "Playing Cards.v3-original_raw-images.yolov8", "data.yaml")
+PRETRAINED_MODEL = os.path.join(di, "pretrained_models", "yolov8s_playing_cards.pt")
+if not os.path.isfile(PRETRAINED_MODEL):
+    raise FileNotFoundError(PRETRAINED_MODEL)
+if not os.path.isfile(DATA):
+    raise FileNotFoundError(DATA)
 
 import datetime
 from ultralytics import YOLO
