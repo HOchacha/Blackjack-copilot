@@ -158,6 +158,7 @@ def predict(yresult, k=0.23) -> list:
     return ret
 
 def get_number_of_clusters(cresult:list) -> int:
+    if not cresult: return 0
     return max(cresult) + 1
 
 def get_size_of_clusters(cresult:list) -> list:

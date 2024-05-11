@@ -5,6 +5,7 @@ import cv2
 import pafy
 import yolo
 import cluster
+import time
 
 def fromvideo(url):
     video = pafy.new(url)
@@ -15,24 +16,14 @@ def fromvideo(url):
         x, y = stream.dimensions
         if y == 720:
             chosen = stream
-    cap = cv2.VideoCapture(chosen.url)
-    print("fromvideo--")
-    return cap
+    return chosen.url
 
 def visualize_video(url):
     model=yolo.get_model(BEST)
-    cap = fromvideo(url)
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-        
-        results = yolo.predict_matlike(model,frame)
-        yresult = results[0]
+    streamurl = fromvideo(url)
+    results = model.predict(streamurl, stream=True, imgsz=(1280,720))
+    for yresult in results:
         vis = cluster.visualize_by_yresult(yresult)
         print(cluster.get_final_result_by_yresult(yresult))
-        cv2.imshow("result", vis)
-        if cv2.waitKey(1) > 0:
-            break
 
 visualize_video(URL)
