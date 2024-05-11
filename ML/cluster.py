@@ -256,3 +256,20 @@ def visualize(yresult, cresult:list):
 
     im = annotator.result()
     return im
+
+def visualize_by_yresult(yresult):
+    cresult = predict(yresult)
+    return visualize(yresult, cresult)
+
+def get_final_result_by_yresult(yresult):
+    cresult = predict(yresult)
+    presult = get_plain_result(yresult, cresult)
+    match_result(presult)
+    dealer_index = get_dealer_index(yresult, cresult)
+
+    if dealer_index > 0:
+        # Make dealer be always at index 0
+        presult[0], presult[dealer_index] = presult[dealer_index], presult[0]
+        dealer_index = 0
+
+    return presult
