@@ -14,18 +14,12 @@ def predict(source):
 
     return results[0]
 
-def get_mid_xy_list(result):
-    xyxy = result.boxes.xyxy
+def get_center(xyxyn):
+    x1 = xyxyn[0]
+    y1 = xyxyn[1]
+    x2= xyxyn[2]
+    y2 =xyxyn[3]
+    return ((x1+x2)/2, (y1+y2)/2)
 
-    # to remove GPU CUDA device information
-    xyxy = xyxy.cpu()
-
-    mid_xy = []
-    for i in xyxy:
-        x1=i[0]
-        y1=i[1]
-        x2=i[2]
-        y2=i[3]
-        mid_xy.append(((x1+x2)/2, (y1+y2)/2))
-    
-    return mid_xy
+def get_center2(xyxyn_cpu):
+    return [*map(get_center, xyxyn_cpu)]
