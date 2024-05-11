@@ -1,6 +1,7 @@
 import os
 from ultralytics.utils.plotting import Annotator
 import numpy as np
+import sys
 
 def get_files(dir:str) -> list:
     dirlist = os.listdir(dir)
@@ -55,7 +56,7 @@ def match_cards(yresult, k=0.32) -> list:
     ret = [-1] * n
     uniqueid = 0
 
-    for i in range(n):
+    for i in range(n-1):
 
         # if already matched, continue
         if ret[i] != -1: continue
@@ -71,27 +72,39 @@ def match_cards(yresult, k=0.32) -> list:
                 ret[i] = uniqueid
                 ret[j] = uniqueid
                 uniqueid += 1
+                break
+    
     # e.g. [-1 -1 0 -1 0 1 1 -1 -1 2 -1 -1 3 2 -1 3]
     return ret
 
 def get_pairs_from_matcharr(matcharr:list) -> list:
     n = len(matcharr)
+    if n < 2:
+        return []
+
     ret = []
 
-    for i in range(n-1):
-        cls = matcharr[i]
-        if cls == -1: continue
+    try:
+        for i in range(n-1):
+            cls = matcharr[i]
+            if cls == -1: continue
 
-        j = matcharr.index(cls, i+1)
-        ret.append((i,j))
-        matcharr[i] = -1
-        matcharr[j] = -1
+            j = matcharr.index(cls, i+1)
+            ret.append((i,j))
+            matcharr[i] = -1
+            matcharr[j] = -1
+
+    except ValueError:
+        errmsg = "i=%d n=%d cls=%d matcharr=%s\n"%(i, n, cls, matcharr)
+        sys.stderr.write(errmsg)
+        raise
 
     # e.g. [(0 3) (4 9) (5 6) (7 10)]
     return ret
 
 def get_pairs_with_yresult(yresult) -> list:
-    return get_pairs_from_matcharr(match_cards(yresult))
+    matcharr = match_cards(yresult)
+    return get_pairs_from_matcharr(matcharr)
 
 def do_pair_on_arr(xyarr:list, match_pairs:list) -> None:
     for i, j in match_pairs:
@@ -114,7 +127,7 @@ def compress_coords(arr:list) -> None:
     for i in range(len(arr)):
         arr[i] = compressed_coords[i]
 
-def predict(yresult, k=0.23) -> list:
+def predict(yresult, k=0.22) -> list:
     xyxycpu = yresult.boxes.xyxy.cpu()
     height = yresult.orig_shape[0]
     width = yresult.orig_shape[1]
@@ -153,6 +166,19 @@ def predict(yresult, k=0.23) -> list:
                     ret[j] = ret[i]
         
     compress_coords(ret)
+
+
+
+    # This code snippet does not affect on final result, but it is added for stability and testability
+    dealer_index = get_dealer_index(yresult, ret)
+    if dealer_index > 0:
+        for i in range(n):
+            if ret[i] == 0:
+                ret[i] = dealer_index
+            elif ret[i] == dealer_index:
+                ret[i] = 0
+
+
 
     #e.g. [0 0 0 1 0 1 1 2 2 0 1 2 3]
     return ret
