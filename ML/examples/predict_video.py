@@ -11,11 +11,11 @@ if not os.path.isfile(VIDEO):
 
 # based on https://docs.ultralytics.com/modes/predict/#streaming-source-for-loop
 
-import yoluster
+from yoluster import YOLOCluster
 import cv2
 
 # Load the YOLOv8 model
-model = yoluster.get_best_yolo_model()
+model = YOLOCluster()
 
 # Open the video file
 cap = cv2.VideoCapture(VIDEO)
@@ -27,28 +27,30 @@ while cap.isOpened():
     success, frame = cap.read()
 
     if success:
-        if stress == 1:
+        
+        if stress < 2:
+            stress += 1
+
+        else:
             stress = 0
-            continue
 
-        # Run YOLOv8 inference on the frame
-        results = yoluster.yolo_predict_m(model, frame)
+            # Run YOLOv8 inference on the frame
+            results = model(frame)
 
-        # Visualize the results on the frame
-        annotated_frame = yoluster.plot(results[0])
+            # Visualize the results on the frame
+            annotated_frame = model.plotc(results[0])
 
-        # Display the annotated frame
-        cv2.imshow("YOLOv8 Inference", annotated_frame)
+            # Display the annotated frame
+            cv2.imshow("YOLOv8 Inference", annotated_frame)
 
-        # Break the loop if 'q' is pressed
-        pkey = cv2.waitKey(1) & 0xFF
-        if pkey == ord("q"):
-            break
-        # pause if 'p' is pressed
-        if pkey == ord("p"):
-            cv2.waitKey()
+            # Break the loop if 'q' is pressed
+            pkey = cv2.waitKey(1) & 0xFF
+            if pkey == ord("q"):
+                break
 
-        stress += 1
+            # pause if 'p' is pressed
+            if pkey == ord("p"):
+                cv2.waitKey()
 
     else:
         # Break the loop if the end of the video is reached
