@@ -1,17 +1,22 @@
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+af = os.path.abspath(__file__)
+di = os.path.dirname(af)
+did = os.path.dirname(di)
+sys.path.append(did)
 
 # based on https://docs.ultralytics.com/modes/predict/#streaming-source-for-loop
 
-import yoluster
+from yoluster import YOLOCluster
 import cv2
 
 # Load the YOLOv8 model
-model = yoluster.get_best_yolo_model()
+model = YOLOCluster()
 
-# Open the video file
+# Open the webcam
 cap = cv2.VideoCapture(0)
+count = 0
 
 # Loop through the video frames
 while cap.isOpened():
@@ -20,17 +25,24 @@ while cap.isOpened():
 
     if success:
         # Run YOLOv8 inference on the frame
-        results = yoluster.yolo_predict_m(model, frame)
+        results = model(frame)
 
         # Visualize the results on the frame
-        annotated_frame = yoluster.plot(results[0])
+        annotated_frame = model.plotc(results[0])
 
         # Display the annotated frame
         cv2.imshow("YOLOv8 Inference", annotated_frame)
 
+        pkey = cv2.waitKey(1) & 0xFF
+
         # Break the loop if 'q' is pressed
-        if cv2.waitKey(1) & 0xFF == ord("q"):
+        if pkey == ord("q"):
             break
+
+        # pause if 'p' is pressed
+        if pkey == ord("p"):
+            cv2.waitKey()
+        
     else:
         # Break the loop if the end of the video is reached
         break

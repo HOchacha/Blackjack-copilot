@@ -1,7 +1,7 @@
 import os
 
 di = os.path.dirname(os.path.abspath(__file__))
-IMAGE = os.path.join(di, "..", "yolo", "train_workspace", "extern_test_images", "1280x720.png")
+IMAGE = os.path.join(di, "..", "yolo", "train_workspace", "extern_test_images", "1280x720_2.png")
 if not os.path.isfile(IMAGE):
     raise FileNotFoundError(IMAGE)
 
@@ -14,7 +14,7 @@ import cv2
 model = YOLOCluster()
 results = model(IMAGE)
 for result in results:
-    print(result)
+    print(result.mparr)
     im = model.plotc(result)
     cv2.imshow("plotc", im)
     cv2.waitKey()

@@ -24,6 +24,9 @@ class YOLOCluster(YOLO):
                 os.path.dirname(os.path.abspath(__file__)), "yolo", "train_workspace", "runs", "detect", "train", "weights", "best.pt")
         super().__init__(model, task, verbose)
 
+    C_RATIO = 0.22
+    M_RATIO = 0.35
+
     def predict(
         self,
         source: Union[str, Path, int, list, tuple, np.ndarray, torch.Tensor] = None,
@@ -59,6 +62,7 @@ class YOLOCluster(YOLO):
     @staticmethod
     def _get_pairs(matcharr:list) -> list:
         "[-1 -1 0 -1 0 1 2 1 2 -1] -> [(2,4) (5,7) (6,8)]"
+        matcharr = matcharr[:]
         n = len(matcharr)
 
         ret = []
@@ -96,14 +100,13 @@ class YOLOCluster(YOLO):
             ret = [-1]
         
         else:
-            standard = min(width, height) * 0.32
+            standard = min(width, height) * YOLOCluster.M_RATIO
 
             # -1 means it is not matched to any symbol yet
             ret = [-1] * n
             uniqueid = 0
-
+            
             for i in range(n-1):
-
                 # if already matched, continue
                 if ret[i] != -1: continue
 
@@ -232,6 +235,8 @@ class YOLOCluster(YOLO):
         
         yresult.dealeri = ret
 
+    
+
     @staticmethod
     def _get_carr(yresult) -> None:
         xyxycpu = yresult.boxes.xyxy.cpu()
@@ -251,7 +256,7 @@ class YOLOCluster(YOLO):
         else:
             YOLOCluster._get_mxyarr(yresult)
             
-            standard = min(width, height) * 0.22
+            standard = min(width, height) * YOLOCluster.C_RATIO
 
             # -1 means it is not belong to any cluster yet
             ret = [-1] * n

@@ -19,7 +19,7 @@ model = YOLOCluster()
 
 # Open the video file
 cap = cv2.VideoCapture(VIDEO)
-stress = 0
+count = 0
 
 # Loop through the video frames
 while cap.isOpened():
@@ -27,30 +27,27 @@ while cap.isOpened():
     success, frame = cap.read()
 
     if success:
+        # Run YOLOv8 inference on the frame
+        results = model(frame)
+
+        # Visualize the results on the frame
+        annotated_frame = model.plotc(results[0])
+
+        # Display the annotated frame
+        cv2.imshow("YOLOv8 Inference", annotated_frame)
+
+        pkey = cv2.waitKey(1) & 0xFF
+
+        # Break the loop if 'q' is pressed
+        if pkey == ord("q"):
+            break
+
+        # pause if 'p' is pressed
+        if pkey == ord("p"):
+            cv2.waitKey()
         
-        if stress < 2:
-            stress += 1
-
-        else:
-            stress = 0
-
-            # Run YOLOv8 inference on the frame
-            results = model(frame)
-
-            # Visualize the results on the frame
-            annotated_frame = model.plotc(results[0])
-
-            # Display the annotated frame
-            cv2.imshow("YOLOv8 Inference", annotated_frame)
-
-            # Break the loop if 'q' is pressed
-            pkey = cv2.waitKey(1) & 0xFF
-            if pkey == ord("q"):
-                break
-
-            # pause if 'p' is pressed
-            if pkey == ord("p"):
-                cv2.waitKey()
+        count += 2
+        cap.set(cv2.CAP_PROP_POS_FRAMES, count)
 
     else:
         # Break the loop if the end of the video is reached
