@@ -7,6 +7,7 @@ import random
 def basic_strategy(player_hand_total, dealer_upcard):
     blackjack_table = {
         # Hard totals
+        # not start with ace or count ace as 1
         (4, 2): ("Hit", None, None, None),
         (4, 3): ("Hit", None, None, None),
         (4, 4): ("Hit", None, None, None),
@@ -19,6 +20,7 @@ def basic_strategy(player_hand_total, dealer_upcard):
         (4, 11): ("Hit", None, None, None),
 
         # Soft totals
+        #
         (14, 2): ("Hit", "Hit", None, None),
         (14, 3): ("Hit", "Hit", None, None),
         (14, 4): ("Hit", "Hit", None, None),
@@ -55,8 +57,8 @@ def detect_objects():
 
 
 def simulate_blackjack():
-    player_hand = random.randint(4, 21)
-    dealer_upcard = random.randint(2, 11)
+    player_hand = int(input())
+    dealer_upcard = int(input())
 
     print("Player's hand total:", player_hand)
     print("Dealer's upcard:", dealer_upcard)
@@ -66,29 +68,8 @@ def simulate_blackjack():
 
 
 def main():
-    camera = cv2.VideoCapture(0)
-
-    while True:
-        ret, frame = camera.read()
-        if not ret:
-            print("Error: Failed to capture frame")
-            break
-
-        detected_objects = detect_objects()
-
-        if "playing cards" in detected_objects:
-            simulate_blackjack()
-
-        cv2.imshow("Object Detection", frame)
-
-        key = cv2.waitKey(1)  # Moved outside the condition
-
-        if key & 0xFF == ord('q'):
-            break
-
-    camera.release()
-    cv2.destroyAllWindows()
+    simulate_blackjack()
 
 
-if name == "__main__":
+if __name__ == "__main__":
     main()
