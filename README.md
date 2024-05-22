@@ -1,7 +1,17 @@
 # Blackjack-copilot
 Blackjack Copilot recommends a next action(e.g. Hit, stand) which has the highest winning rate.
 
+## Description
 It gets the card game board image as input, and gives an optimal action as output.
+
+## Progress
+- [x] Train YOLOv8 object detection model
+- [x] Cluster cards for dealer and players
+- [x] Implement lookup table of optimal actions
+- [ ] Demonstrate the final result of video/webcam/stream
+- [ ] Make Blackjack Copilot get in Raspberry PI 4
+- [ ] Complete GitHub README.md
+- [ ] Make descripting YouTube video
 
 ## ML training result
 Object detection is based on YOLOv8s model.
