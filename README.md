@@ -8,6 +8,7 @@ It gets the card game board image as input, and gives an optimal action as outpu
 - [x] Train YOLOv8 object detection model
 - [x] Cluster cards for dealer and players
 - [x] Implement lookup table of optimal actions
+- [ ] Recommend action in the case that player has 3 cards.
 - [ ] Demonstrate the final result of video/webcam/stream
 - [ ] Make Blackjack Copilot get in Raspberry PI 4
 - [ ] Complete GitHub README.md

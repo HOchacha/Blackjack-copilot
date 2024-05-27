@@ -1,3 +1,5 @@
+DEBUG_VIDEO = False
+
 import os
 import sys
 import cv2
@@ -8,44 +10,178 @@ sys.path.append(yoluster_dir)
 
 from yoluster import YOLOCluster
 
-blackjack_copilot_strategy = {
-    (4, 2): ("Hit", None, None, None),
-    (4, 3): ("Hit", None, None, None),
-    (4, 4): ("Hit", None, None, None),
-    (4, 5): ("Hit", None, None, None),
-    (4, 6): ("Hit", None, None, None),
-    (4, 7): ("Hit", None, None, None),
-    (4, 8): ("Hit", None, None, None),
-    (4, 9): ("Hit", None, None, None),
-    (4, 10): ("Hit", None, None, None),
-    (4, 11): ("Hit", None, None, None),
+# https://www.blackjackapprenticeship.com/blackjack-strategy-charts
+# 0=S (Stand)
+# 1=H (Hit)
+# 2=D (Double if allowed, otherwise hit)
+# 3=Ds (Double if allowed, otherwise stand)
 
-    (14, 2): ("Hit", "Hit", None, None),
-    (14, 3): ("Hit", "Hit", None, None),
-    (14, 4): ("Hit", "Hit", None, None),
-    (14, 5): ("Hit", "Hit", None, None),
-    (14, 6): ("Hit", "Hit", None, None),
-    (14, 7): ("Hit", "Hit", None, None),
-    (14, 8): ("Hit", "Hit", None, None),
-    (14, 9): ("Hit", "Hit", None, None),
-    (14, 10): ("Hit", "Hit", None, None),
-    (14, 11): ("Hit", "Hit", None, None),
+HARDTOTALS="""0000000000
+0000011111
+0000011111
+0000011111
+0000011111
+1100011111
+2222222222
+2222222211
+1222211111
+1111111111""".splitlines()
 
-    (16, 9): (None, None, "Surrender", None),
-    (16, 10): (None, None, "Surrender", None),
-    (16, 11): (None, None, "Surrender", None),
+SOFTTOTALS="""0000000000
+0000300000
+3333300111
+1222211111
+1122211111
+1122211111
+1112211111
+1112211111""".splitlines()
 
-    (8, 2): (None, None, None, "Split"),
-    (8, 3): (None, None, None, "Split"),
-    (8, 4): (None, None, None, "Split"),
-    (8, 5): (None, None, None, "Split"),
-    (8, 6): (None, None, None, "Split"),
-    (10, 10): (None, None, None, "Split"),
-}
+# 4 = Y (Split the pair)
+# 5 = N (Don't split the pair)
+# 6 = Y/N (Split only if 'DAS' is offered)
+
+# DAS means Double After Split.
+
+PAIRSPLITTING="""4444444444
+5555555555
+4444454455
+4444444444
+4444445555
+6444455555
+5555555555
+5556655555
+6644445555
+6644445555""".splitlines()
+
+# 7 = null
+# 8 = SUR (Surrender)
+
+LATESURRENDER="""7777777888
+7777777787
+7777777777""".splitlines()
+
+PICTURECARD = "JKQ"
+
+def get_sum_of_cards(hard_count:int, number_of_ace:int) -> int:
+    if number_of_ace == 0:
+        return hard_count
+    
+
+
+    if number_of_ace == 1:
+
+        # Ace can be interpreted as 11 or 1, to make sum closer to 21 (but less than or equal to 21).
+
+        if hard_count < 11:
+            return hard_count + 11
+        return hard_count + 1
+    
+
+
+    # only up to one ace card can be interpreted as 11 because 11*2=22 exceeds 21.
+    ret = hard_count + number_of_ace - 1
+
+    if ret < 11:
+        return ret + 11
+    return ret + 1
+
+def is_pair(pair_of_cards:tuple):
+    if len(pair_of_cards) != 2:
+        return False
+
+    return get_card_value(pair_of_cards[0]) == get_card_value(pair_of_cards[1])
+
+def get_card_value(card:str):
+    """
+    Get value of a card.
+    NOTE: Ace card returns 11.
+    """
+    if card[0] in PICTURECARD:
+        return 10
+    if card[0] == "A":
+        return 11
+    return int(card[0])
+
+def get_recommended_action(my_cards:tuple, dealer_upcard:str, surrender_allowed=False, split_allowed=False, double_allowed=False, das=False) -> int:
+    """
+    Get recommended action for a player.
+
+    return(int):
+    -1 = nothing to recommend
+    0 = stand
+    1 = hit
+    2 = double
+    4 = split the pair
+    8 = surrender
+    """
+    my_sum = 0
+    ace_count = 0
+    for card in my_cards:
+        card:str
+
+        # if card is jack king queen (10)
+        if card[0] in PICTURECARD:
+            my_sum += 10
+
+        elif card[0] == "A":
+            ace_count += 1
+        
+        else:
+            # card is 2~9
+            my_sum += int(card[0])
+    
+    # SOFT means player has ace. HARD means player has no ace.
+    is_soft = ace_count > 0
+
+    my_sum = get_sum_of_cards(my_sum, ace_count)
+
+    if my_sum >= 21:
+        return -1
+
+    dealer_index = get_card_value(dealer_upcard) - 2
+
+    if surrender_allowed and (14 <= my_sum <= 16):
+        if LATESURRENDER[16 - my_sum][dealer_index] == "8":
+            return 8
+    
+    if split_allowed and is_pair(my_cards):
+        card_value = get_card_value(my_cards[0])
+        element = PAIRSPLITTING[11 - card_value][dealer_index]
+
+        if element == "6" and das:
+            return 4
+        
+        if element == "4":
+            return 4
+        
+    
+    if is_soft:
+        element = SOFTTOTALS[20 - my_sum][dealer_index]
+    else:
+        element = SOFTTOTALS[17 - my_sum][dealer_index]
+
+    if element == "2":
+        if double_allowed:
+            return 2
+        else:
+            return 1
+    
+    if element == "3":
+        if double_allowed:
+            return 2
+        else:
+            return 0
+    
+    return int(element)
+
 
 model = YOLOCluster()
 
-cap = cv2.VideoCapture(0)
+source = 0
+if DEBUG_VIDEO:
+    source = os.path.join(yoluster_dir, "yolo", "train_workspace", "extern_test_videos", "blackjack.mp4")
+
+cap = cv2.VideoCapture(source)
 count = 0
 
 while cap.isOpened():
@@ -53,8 +189,15 @@ while cap.isOpened():
 
     if success:
         results = model(frame)
+        result = results[0]
 
-        annotated_frame = model.plotc(results[0])
+        mparr = result.mparr
+        if len(mparr) > 1:
+            dealer_upcard = mparr[0][0]
+            if len(mparr[1]) > 1:
+                print("Recommended action:", get_recommended_action(mparr[1], dealer_upcard))
+
+        annotated_frame = model.plotc(result)
 
         cv2.imshow("YOLOv8 Inference", annotated_frame)
 
@@ -65,6 +208,10 @@ while cap.isOpened():
 
         if pkey == ord("p"):
             cv2.waitKey()
+        
+        if DEBUG_VIDEO:
+            count += 3
+            cap.set(cv2.CAP_PROP_POS_FRAMES, count)
 
     else:
         break
