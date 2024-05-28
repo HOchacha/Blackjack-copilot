@@ -1,187 +1,204 @@
-DEBUG_VIDEO = False
-
 import os
 import sys
 import cv2
 
-fabspath = os.path.abspath(__file__)
-yoluster_dir = os.path.join(fabspath, "..", "..", "..", "ML")
+yoluster_dir = "C:/Users/user/PycharmProjects/Blackjack_Copilot"
 sys.path.append(yoluster_dir)
 
 from yoluster import YOLOCluster
 
-# https://www.blackjackapprenticeship.com/blackjack-strategy-charts
-# 0=S (Stand)
-# 1=H (Hit)
-# 2=D (Double if allowed, otherwise hit)
-# 3=Ds (Double if allowed, otherwise stand)
+blackjack_copilot_strategy = {
+    (4, 2): ("Hit", None, None, None),
+    (4, 3): ("Hit", None, None, None),
+    (4, 4): ("Hit", None, None, None),
+    (4, 5): ("Hit", None, None, None),
+    (4, 6): ("Hit", None, None, None),
+    (4, 7): ("Hit", None, None, None),
+    (4, 8): ("Hit", None, None, None),
+    (4, 9): ("Hit", None, None, None),
+    (4, 10): ("Hit", None, None, None),
+    (4, 11): ("Hit", None, None, None),
 
-HARDTOTALS="""0000000000
-0000011111
-0000011111
-0000011111
-0000011111
-1100011111
-2222222222
-2222222211
-1222211111
-1111111111""".splitlines()
+    (5, 2): ("Hit", None, None, None),
+    (5, 3): ("Hit", None, None, None),
+    (5, 4): ("Hit", None, None, None),
+    (5, 5): ("Hit", None, None, None),
+    (5, 6): ("Hit", None, None, None),
+    (5, 7): ("Hit", None, None, None),
+    (5, 8): ("Hit", None, None, None),
+    (5, 9): ("Hit", None, None, None),
+    (5, 10): ("Hit", None, None, None),
+    (5, 11): ("Hit", None, None, None),
 
-SOFTTOTALS="""0000000000
-0000300000
-3333300111
-1222211111
-1122211111
-1122211111
-1112211111
-1112211111""".splitlines()
+    (6, 2): ("Hit", None, None, None),
+    (6, 3): ("Hit", None, None, None),
+    (6, 4): ("Hit", None, None, None),
+    (6, 5): ("Hit", None, None, None),
+    (6, 6): ("Hit", None, None, None),
+    (6, 7): ("Hit", None, None, None),
+    (6, 8): ("Hit", None, None, None),
+    (6, 9): ("Hit", None, None, None),
+    (6, 10): ("Hit", None, None, None),
+    (6, 11): ("Hit", None, None, None),
 
-# 4 = Y (Split the pair)
-# 5 = N (Don't split the pair)
-# 6 = Y/N (Split only if 'DAS' is offered)
+    (7, 2): ("Hit", None, None, None),
+    (7, 3): ("Hit", None, None, None),
+    (7, 4): ("Hit", None, None, None),
+    (7, 5): ("Hit", None, None, None),
+    (7, 6): ("Hit", None, None, None),
+    (7, 7): ("Hit", None, None, None),
+    (7, 8): ("Hit", None, None, None),
+    (7, 9): ("Hit", None, None, None),
+    (7, 10): ("Hit", None, None, None),
+    (7, 11): ("Hit", None, None, None),
 
-# DAS means Double After Split.
+    (8, 2): ("Hit", None, None, "Split"),
+    (8, 3): ("Hit", None, None, "Split"),
+    (8, 4): ("Hit", None, None, "Split"),
+    (8, 5): ("Hit", None, None, "Split"),
+    (8, 6): ("Hit", None, None, "Split"),
+    (8, 7): ("Hit", None, None, None),
+    (8, 8): ("Hit", None, None, None),
+    (8, 9): ("Hit", None, None, None),
+    (8, 10): ("Hit", None, None, None),
+    (8, 11): ("Hit", None, None, None),
 
-PAIRSPLITTING="""4444444444
-5555555555
-4444454455
-4444444444
-4444445555
-6444455555
-5555555555
-5556655555
-6644445555
-6644445555""".splitlines()
+    (9, 2): ("Hit", None, None, None),
+    (9, 3): ("Double", None, None, None),
+    (9, 4): ("Double", None, None, None),
+    (9, 5): ("Double", None, None, None),
+    (9, 6): ("Double", None, None, None),
+    (9, 7): ("Hit", None, None, None),
+    (9, 8): ("Hit", None, None, None),
+    (9, 9): ("Hit", None, None, None),
+    (9, 10): ("Hit", None, None, None),
+    (9, 11): ("Hit", None, None, None),
 
-# 7 = null
-# 8 = SUR (Surrender)
+    (10, 2): ("Double", None, None, None),
+    (10, 3): ("Double", None, None, None),
+    (10, 4): ("Double", None, None, None),
+    (10, 5): ("Double", None, None, None),
+    (10, 6): ("Double", None, None, None),
+    (10, 7): ("Double", None, None, None),
+    (10, 8): ("Double", None, None, None),
+    (10, 9): ("Double", None, None, None),
+    (10, 10): ("Hit", None, None, None),
+    (10, 11): ("Hit", None, None, None),
 
-LATESURRENDER="""7777777888
-7777777787
-7777777777""".splitlines()
+    (11, 2): ("Double", None, None, None),
+    (11, 3): ("Double", None, None, None),
+    (11, 4): ("Double", None, None, None),
+    (11, 5): ("Double", None, None, None),
+    (11, 6): ("Double", None, None, None),
+    (11, 7): ("Double", None, None, None),
+    (11, 8): ("Double", None, None, None),
+    (11, 9): ("Double", None, None, None),
+    (11, 10): ("Double", None, None, None),
+    (11, 11): ("Double", None, None, None),
 
-PICTURECARD = "JKQ"
+    (12, 2): ("Hit", None, None, None),
+    (12, 3): ("Hit", None, None, None),
+    (12, 4): ("Stand", None, None, None),
+    (12, 5): ("Stand", None, None, None),
+    (12, 6): ("Stand", None, None, None),
+    (12, 7): ("Hit", None, None, None),
+    (12, 8): ("Hit", None, None, None),
+    (12, 9): ("Hit", None, None, None),
+    (12, 10): ("Hit", None, None, None),
+    (12, 11): ("Hit", None, None, None),
+    (13, 2): ("Stand", None, None, None),
+    (13, 3): ("Stand", None, None, None),
+    (13, 4): ("Stand", None, None, None),
+    (13, 5): ("Stand", None, None, None),
+    (13, 6): ("Stand", None, None, None),
+    (13, 7): ("Hit", None, None, None),
+    (13, 8): ("Hit", None, None, None),
+    (13, 9): ("Hit", None, None, None),
+    (13, 10): ("Hit", None, None, None),
+    (13, 11): ("Hit", None, None, None),
 
-def get_sum_of_cards(hard_count:int, number_of_ace:int) -> int:
-    if number_of_ace == 0:
-        return hard_count
-    
+    (14, 2): ("Stand", None, None, None),
+    (14, 3): ("Stand", None, None, None),
+    (14, 4): ("Stand", None, None, None),
+    (14, 5): ("Stand", None, None, None),
+    (14, 6): ("Stand", None, None, None),
+    (14, 7): ("Hit", None, None, None),
+    (14, 8): ("Hit", None, None, None),
+    (14, 9): ("Hit", None, None, None),
+    (14, 10): ("Hit", None, None, None),
+    (14, 11): ("Hit", None, None, None),
 
+    (15, 2): ("Stand", None, None, None),
+    (15, 3): ("Stand", None, None, None),
+    (15, 4): ("Stand", None, None, None),
+    (15, 5): ("Stand", None, None, None),
+    (15, 6): ("Stand", None, None, None),
+    (15, 7): ("Hit", None, None, None),
+    (15, 8): ("Hit", None, None, None),
+    (15, 9): ("Hit", None, None, None),
+    (15, 10): ("Surrender", None, None, None),
+    (15, 11): ("Hit", None, None, None),
 
-    if number_of_ace == 1:
+    (16, 2): ("Stand", None, None, None),
+    (16, 3): ("Stand", None, None, None),
+    (16, 4): ("Stand", None, None, None),
+    (16, 5): ("Stand", None, None, None),
+    (16, 6): ("Stand", None, None, None),
 
-        # Ace can be interpreted as 11 or 1, to make sum closer to 21 (but less than or equal to 21).
+    (16, 7): ("Hit", None, None, None),
+    (16, 8): ("Hit", None, None, None),
+    (16, 9): (None, None, "Surrender", None),
+    (16, 10): (None, None, "Surrender", None),
+    (16, 11): (None, None, "Surrender", None),
 
-        if hard_count < 11:
-            return hard_count + 11
-        return hard_count + 1
-    
+    (17, 2): ("Stand", None, None, None),
+    (17, 3): ("Stand", None, None, None),
+    (17, 4): ("Stand", None, None, None),
+    (17, 5): ("Stand", None, None, None),
+    (17, 6): ("Stand", None, None, None),
+    (17, 7): ("Stand", None, None, None),
+    (17, 8): ("Stand", None, None, None),
+    (17, 9): ("Stand", None, None, None),
+    (17, 10): ("Stand", None, None, None),
+    (17, 11): ("Stand", None, None, None),
 
+    (18, 2): ("Stand", None, None, None),
+    (18, 3): ("Stand", None, None, None),
+    (18, 4): ("Stand", None, None, None),
+    (18, 5): ("Stand", None, None, None),
+    (18, 6): ("Stand", None, None, None),
+    (18, 7): ("Stand", None, None, None),
+    (18, 8): ("Stand", None, None, None),
+    (18, 9): ("Stand", None, None, None),
+    (18, 10): ("Stand", None, None, None),
+    (18, 11): ("Stand", None, None, None),
 
-    # only up to one ace card can be interpreted as 11 because 11*2=22 exceeds 21.
-    ret = hard_count + number_of_ace - 1
+    (19, 2): ("Stand", None, None, None),
+    (19, 3): ("Stand", None, None, None),
+    (19, 4): ("Stand", None, None, None),
+    (19, 5): ("Stand", None, None, None),
+    (19, 6): ("Stand", None, None, None),
+    (19, 7): ("Stand", None, None, None),
+    (19, 8): ("Stand", None, None, None),
+    (19, 9): ("Stand", None, None, None),
+    (19, 10): ("Stand", None, None, None),
+    (19, 11): ("Stand", None, None, None),
 
-    if ret < 11:
-        return ret + 11
-    return ret + 1
-
-def is_pair(pair_of_cards:tuple):
-    if len(pair_of_cards) != 2:
-        return False
-
-    return get_card_value(pair_of_cards[0]) == get_card_value(pair_of_cards[1])
-
-def get_card_value(card:str):
-    """
-    Get value of a card.
-    NOTE: Ace card returns 11.
-    """
-    if card[0] in PICTURECARD:
-        return 10
-    if card[0] == "A":
-        return 11
-    return int(card[0])
-
-def get_recommended_action(my_cards:tuple, dealer_upcard:str, surrender_allowed=False, split_allowed=False, double_allowed=False, das=False) -> int:
-    """
-    Get recommended action for a player.
-
-    return(int):
-    -1 = nothing to recommend
-    0 = stand
-    1 = hit
-    2 = double
-    4 = split the pair
-    8 = surrender
-    """
-    my_sum = 0
-    ace_count = 0
-    for card in my_cards:
-        card:str
-
-        # if card is jack king queen (10)
-        if card[0] in PICTURECARD:
-            my_sum += 10
-
-        elif card[0] == "A":
-            ace_count += 1
-        
-        else:
-            # card is 2~9
-            my_sum += int(card[0])
-    
-    # SOFT means player has ace. HARD means player has no ace.
-    is_soft = ace_count > 0
-
-    my_sum = get_sum_of_cards(my_sum, ace_count)
-
-    if my_sum >= 21:
-        return -1
-
-    dealer_index = get_card_value(dealer_upcard) - 2
-
-    if surrender_allowed and (14 <= my_sum <= 16):
-        if LATESURRENDER[16 - my_sum][dealer_index] == "8":
-            return 8
-    
-    if split_allowed and is_pair(my_cards):
-        card_value = get_card_value(my_cards[0])
-        element = PAIRSPLITTING[11 - card_value][dealer_index]
-
-        if element == "6" and das:
-            return 4
-        
-        if element == "4":
-            return 4
-        
-    
-    if is_soft:
-        element = SOFTTOTALS[20 - my_sum][dealer_index]
-    else:
-        element = SOFTTOTALS[17 - my_sum][dealer_index]
-
-    if element == "2":
-        if double_allowed:
-            return 2
-        else:
-            return 1
-    
-    if element == "3":
-        if double_allowed:
-            return 2
-        else:
-            return 0
-    
-    return int(element)
-
+    (20, 2): ("Stand", None, None, None),
+    (20, 3): ("Stand", None, None, None),
+    (20, 4): ("Stand", None, None, None),
+    (20, 5): ("Stand", None, None, None),
+    (20, 6): ("Stand", None, None, None),
+    (20, 7): ("Stand", None, None, None),
+    (20, 8): ("Stand", None, None, None),
+    (20, 9): ("Stand", None, None, None),
+    (20, 10): ("Stand", None, None, None),
+    (20, 11): ("Stand", None, None, None),
+}
 
 model = YOLOCluster()
 
-source = 0
-if DEBUG_VIDEO:
-    source = os.path.join(yoluster_dir, "yolo", "train_workspace", "extern_test_videos", "blackjack.mp4")
-
-cap = cv2.VideoCapture(source)
+cap = cv2.VideoCapture(0)
 count = 0
 
 while cap.isOpened():
@@ -189,15 +206,8 @@ while cap.isOpened():
 
     if success:
         results = model(frame)
-        result = results[0]
 
-        mparr = result.mparr
-        if len(mparr) > 1:
-            dealer_upcard = mparr[0][0]
-            if len(mparr[1]) > 1:
-                print("Recommended action:", get_recommended_action(mparr[1], dealer_upcard))
-
-        annotated_frame = model.plotc(result)
+        annotated_frame = model.plotc(results[0])
 
         cv2.imshow("YOLOv8 Inference", annotated_frame)
 
@@ -208,10 +218,6 @@ while cap.isOpened():
 
         if pkey == ord("p"):
             cv2.waitKey()
-        
-        if DEBUG_VIDEO:
-            count += 3
-            cap.set(cv2.CAP_PROP_POS_FRAMES, count)
 
     else:
         break
