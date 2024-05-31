@@ -4,8 +4,9 @@ di = os.path.dirname(__file__)
 DATA=os.path.join(di, "datasets", "coins_test.v8i.yolov8-obb", "data.yaml")
 os.chdir(di)
 
-# YOLO v8 nano
 PRETRAINED_MODEL = os.path.join(di, "runs", "detect", "chips", "weights", "best.pt")
+
+
 
 # If file not found, raise error.
 
@@ -14,6 +15,8 @@ if not os.path.isfile(PRETRAINED_MODEL):
 
 if not os.path.isfile(DATA):
     raise FileNotFoundError(DATA)
+
+
 
 import datetime
 from ultralytics import YOLO
