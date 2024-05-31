@@ -1,36 +1,40 @@
-# Blackjack-copilot
-Blackjack Copilot recommends a next action(e.g. Hit, stand) which has the highest winning rate.
+# Blackjack-copilot (incomplete)
+Blackjack Copilot recommends a next action(e.g. hit, stand) which has the highest winning rate, that is, optimal for a player.
 
 ## Description
-It gets the card game board image as input, and gives an optimal action as output.
+It gets the card game board image as input, and gives an optimal action as output. Getting a video as input is of course possible since a video is composed of a plenty of continous image frames.
 
-## Progress
-- [x] Train YOLOv8 object detection model
-- [x] Cluster cards for dealer and players
-- [x] Implement lookup table of optimal actions
-- [ ] Recommend action in the case that player has 3 cards.
-- [ ] Demonstrate the final result of video/webcam/stream
-- [ ] Make Blackjack Copilot get in Raspberry PI 4
-- [ ] Complete GitHub README.md
-- [ ] Make descripting YouTube video
+## TODO
+- [x] Train a YOLOv8 object detection model
+- [x] Cluster cards for a dealer and players
+- [x] Implement a lookup table of optimal actions
+- [ ] Also detect a casino chip
+- [ ] Recommend action in the case that player has more than two cards
+- [ ] Make Blackjack Copilot work for video, webcam or stream
+- [ ] Make Blackjack Copilot work in Raspberry PI 4
+- [ ] Complete a GitHub README.md
+- [ ] Make a descripting YouTube video
+- [ ] Complete the project
 
-## ML training result
+## Machine Learning Training Result
 Object detection is based on YOLOv8s model.
 
-It is trained for 13 epochs(10 epochs are pretrained by PD-Mera. [#](https://github.com/PD-Mera/Playing-Cards-Detection?tab=readme-ov-file#experiment-results)).
+It is trained for 13 epochs(10 epochs are pretrained by [PD-Mera](https://github.com/PD-Mera/Playing-Cards-Detection?tab=readme-ov-file#experiment-results)).
 
-Training dataset has 10100 images.
+The training dataset has 10100 original images (except augmented).
 
-![image](https://github.com/HOchacha/Blackjack-copilot/blob/f3d8c944122eb5a75284d99ed601b3c836a28c5c/ML/yolo/train_workspace/runs/detect/train/val_batch2_pred.jpg?raw=true)
-![image](https://github.com/HOchacha/Blackjack-copilot/assets/70701690/d9f14337-2f5b-4b25-a261-2c169afcac5e)
-![image](https://github.com/HOchacha/Blackjack-copilot/assets/70701690/ec2fb334-465c-49d4-a070-d4d8ad9e22e5)
+![image](/ML/yolo/train_workspace/runs/detect/train/val_batch2_pred.jpg)
+
+![image](/app/util/Lookup_Algorithm_Output/testing.jpg)
+
+![image](/app/util/Lookup_Algorithm_Output/testing2.jpg)
 
 ## Reference
 - [roboflow Playing Cards Dataset](https://universe.roboflow.com/augmented-startups/playing-cards-ow27d)
-- [GitHub source of pretrained model](https://github.com/PD-Mera/Playing-Cards-Detection)
+- [GitHub repository as source of pretrained model](https://github.com/PD-Mera/Playing-Cards-Detection)
 - [download link of pretrained model](https://drive.google.com/file/d/1AqZnW6dI6flFZvGxAn6A9apDNSviXZ5f/view?usp=share_link)
-- [another GitHub repository which used the same pretrained model](https://github.com/noorkhokhar99/Playing-Cards-Detection-with-YoloV8)
+- [another GitHub repository which contains the same pretrained model](https://github.com/noorkhokhar99/Playing-Cards-Detection-with-YoloV8) (Jan 27, 2023)
 - [Ultralytics](https://github.com/ultralytics/ultralytics)
 - [Ultralytics YOLOv8 Docs](https://docs.ultralytics.com)
-- [Blackjack playing sample YouTube video](https://www.youtube.com/watch?v=fbb5nFIjMn0)
-
+- [Blackjack playing video](https://www.youtube.com/watch?v=fbb5nFIjMn0) (not demo of this project)
+- [opencv-python](https://pypi.org/project/opencv-python)

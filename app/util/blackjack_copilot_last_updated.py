@@ -2,7 +2,8 @@ import os
 import sys
 import cv2
 
-yoluster_dir = "C:/Users/user/PycharmProjects/Blackjack_Copilot"
+yoluster_dir = os.path.join(__file__, "..", "..", "..", "ML")
+yoluster_dir = os.path.abspath(yoluster_dir)
 sys.path.append(yoluster_dir)
 
 from yoluster import YOLOCluster
