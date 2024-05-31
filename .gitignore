@@ -1,4 +1,11 @@
-__pycache__
-.ipynb_checkpoints
+__pycache__/
+.ipynb_checkpoints/
+.vscode/
+
+*.yolov8*.zip
+*_jpg.rf.*.jpg
+*_jpg.rf.*.txt
+
+labels.cache
+last.pt
 yolov8n.pt
-.vscode
