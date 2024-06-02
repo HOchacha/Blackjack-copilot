@@ -1,7 +1,7 @@
 task: detect
 mode: train
 model: c:\Users\a\source\repos\Blackjack-copilot\ML\yolo\train_workspace\runs\detect\chips\weights\best.pt
-data: c:\Users\a\source\repos\Blackjack-copilot\ML\yolo\train_workspace\datasets\coins_test.v8i.yolov8-obb\data.yaml
+data: c:\Users\a\source\repos\Blackjack-copilot\ML\yolo\train_workspace\datasets\chips-counter-V4-color.v1i.yolov8-obb\data.yaml
 epochs: 100
 time: null
 patience: 2

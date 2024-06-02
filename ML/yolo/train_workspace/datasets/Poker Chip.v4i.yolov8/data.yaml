@@ -1,0 +1,13 @@
+train: ./train/images
+val: ./valid/images
+test: ./test/images
+
+nc: 5
+names: ['Black Chip', 'Blue Chip', 'Green Chip', 'Red Chip', 'White Chip']
+
+roboflow:
+  workspace: nicolas-workbench
+  project: poker-chip
+  version: 4
+  license: MIT
+  url: https://universe.roboflow.com/nicolas-workbench/poker-chip/dataset/4

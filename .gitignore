@@ -3,9 +3,9 @@ __pycache__/
 .vscode/
 
 *.yolov8*.zip
-*_jpg.rf.*.jpg
-*_jpg.rf.*.txt
+*.rf.*.jpg
+*.rf.*.txt
 
 labels.cache
 last.pt
-yolov8n.pt
+yolov8?.pt
