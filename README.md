@@ -11,9 +11,6 @@ It gets the card game board image as input, and gives an optimal action as outpu
 - [ ] Also detect a casino chip
 - [ ] Recommend action in the case that player has more than two cards
 - [ ] Make Blackjack Copilot work for video, webcam or stream
-- [ ] Complete a GitHub README.md
-- [ ] Make a descripting YouTube video
-- [ ] Complete the project
 
 ## Machine Learning Training Result
 Object detection is based on YOLOv8s model.
