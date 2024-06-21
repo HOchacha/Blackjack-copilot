@@ -41,6 +41,11 @@ Preprocess(Threshold by opencv) the dataset and image, to make them binary image
 
 It has little difference to RGB colored one's result. To make image binary seems meaningless.
 
+## YOLOv8n training result
+![image](runs/detect/train/results.png)
+![image](runs/detect/train/val_batch2_pred.jpg)
+More information is in [runs/detect/train](runs/detect/train) directory.
+
 ## Trivia
 
 I trained YOLO model by Google Colab Tesla T4 GPU. Its speed is very fast that it can train in 5 minutes per each epoch while my GTX 970 takes it in 3 hours.
