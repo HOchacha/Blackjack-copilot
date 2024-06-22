@@ -11,6 +11,7 @@ Run
 
 ## Description
 It gets the card game board image as input, and gives an optimal action as output. Getting a video as input is of course possible since a video is composed of a plenty of continous image frames.
+![image](images/0.jpg)
 
 ## TODO
 - [x] Train a YOLOv8 object detection model
