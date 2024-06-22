@@ -93,7 +93,8 @@ class BlackjackUI(QMainWindow):
             1: "Hit",
             2: "Double",
             4: "Split",
-            8: "Surrender"
+            8: "Surrender",
+            10:"Must Win case"
         }
         return actions.get(action_code, "Unknown")
 

@@ -142,8 +142,9 @@ def get_recommended_action(my_cards: tuple, dealer_upcard: str, surrender_allowe
     # SOFT means player has ace. HARD means player has no ace.
     is_soft = ace_count > 0
     my_sum = get_sum_of_cards(my_sum, ace_count)
-
-    if my_sum >= 21:
+    if my_sum == 21:
+        return 10;
+    if my_sum > 21:
         return -1
 
     print("my_sum=%d ace_count=%d" % (my_sum, ace_count))
