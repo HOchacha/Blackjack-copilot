@@ -1,6 +1,9 @@
 # Blackjack-copilot
 Blackjack Copilot recommends a next action(e.g. hit, stand) which has the highest winning rate, that is, optimal for a player.
 
+### presentation video
+[youtube video](https://www.youtube.com/watch?v=Vrf_SvaXD0A)
+
 # To run the code
 first do 
 `git clone https://github.com/HOchacha/Blackjack-copilot`
