@@ -1,5 +1,13 @@
-# Blackjack-copilot (incomplete)
+# Blackjack-copilot
 Blackjack Copilot recommends a next action(e.g. hit, stand) which has the highest winning rate, that is, optimal for a player.
+
+# To run the code
+first do 
+`git clone https://github.com/HOchacha/Blackjack-copilot`
+then install the dependency
+`pip install ultralytics opency-python numpy torch PyQt5`
+Run
+`python3 ./app/util/main.app.py`
 
 ## Description
 It gets the card game board image as input, and gives an optimal action as output. Getting a video as input is of course possible since a video is composed of a plenty of continous image frames.
@@ -8,9 +16,8 @@ It gets the card game board image as input, and gives an optimal action as outpu
 - [x] Train a YOLOv8 object detection model
 - [x] Cluster cards for a dealer and players
 - [x] Implement a lookup table of optimal actions
-- [ ] Also detect a casino chip
-- [ ] Recommend action in the case that player has more than two cards
-- [ ] Make Blackjack Copilot work for video, webcam or stream
+- [x] Recommend action in the case that player has more than two cards
+- [x] Make Blackjack Copilot work for video, webcam or stream
 
 ## Machine Learning Training Result
 Object detection is based on YOLOv8s model.
