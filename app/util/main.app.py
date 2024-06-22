@@ -69,7 +69,7 @@ class BlackjackUI(QMainWindow):
                 dealer_upcard = mparr[0][0]
                 print(dealer_upcard)
                 if len(mparr[1]) > 1:
-                    print("read")
+                    print(mparr[1])
 
                     recommended_action = get_recommended_action(mparr[1], dealer_upcard)
                     action_text = self.get_action_text(recommended_action)
@@ -83,11 +83,12 @@ class BlackjackUI(QMainWindow):
             self.cap.release()
 
     def get_action_text(self, action_code):
-       
+        '''
         if action_code == -1:
-            return self.action_label.text()
+        return self.action_label.text()
+        '''
         actions = {
-            -1: "No Action",
+            -1: "Burst Fail",
             0: "Stand",
             1: "Hit",
             2: "Double",
