@@ -6,11 +6,11 @@ Blackjack Copilot recommends a next action(e.g. hit, stand) which has the highes
 
 # To run the code
 first do 
-`git clone https://github.com/HOchacha/Blackjack-copilot`
+```git clone https://github.com/HOchacha/Blackjack-copilot```
 then install the dependency
-`pip install ultralytics opency-python numpy torch PyQt5`
+```pip install ultralytics opency-python numpy torch PyQt5```
 Run
-`python3 ./app/util/main.app.py`
+```python3 ./app/util/main.app.py```
 
 ## Description
 It gets the card game board image as input, and gives an optimal action as output. Getting a video as input is of course possible since a video is composed of a plenty of continous image frames.
